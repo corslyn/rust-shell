@@ -35,6 +35,7 @@ fn main() {
                     ShellCommands::exit(0); // Default to exit code 0
                 }
             }
+            Command::Pwd => ShellCommands::pwd(),
             Command::Unknown(_) => ShellCommands::unknown(command_str),
         }
     }
