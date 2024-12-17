@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, path::Path};
 
 pub struct ShellCommands;
 
@@ -25,6 +25,20 @@ impl Command {
 
 impl ShellCommands {
     // add commands here
+
+    pub fn check_in_path(command: &str, path: &str) -> Option<std::path::PathBuf> {
+        let paths: Vec<&str> = path.split(":").collect();
+
+        for dir in paths {
+            let candidate = Path::new(dir).join(command);
+            if candidate.is_file() {
+                return Some(candidate)
+            }
+
+        }
+        None
+    }
+
     pub fn exit(exit_code: i32) {
         std::process::exit(exit_code)
     }
@@ -42,10 +56,15 @@ impl ShellCommands {
         }
     }
 
-    pub fn r#type(command: &str) {
+    pub fn r#type(command: &str, path: &str) {
         match Command::from_str(command) {
             Command::Unknown(_) => {
-                eprintln!("type: {}: not found", command);
+                if let Some(found_path) = ShellCommands::check_in_path(command, path) {
+                    println!("{} is {}", command, found_path.display())
+                } else {
+                    eprintln!("type: {}: not found", command);
+                }
+               
             }
             _ => {
                 println!("{} is a shell builtin", command);

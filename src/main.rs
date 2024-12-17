@@ -1,4 +1,4 @@
-use std::{io::{self, Read, Write}, process::exit};
+use std::{env, io::{self, Read, Write}, process::exit};
 
 mod commands;
 use commands::{Command, ShellCommands};
@@ -15,10 +15,18 @@ fn main() {
         if trimmed_input.is_empty() {
             continue;
         }
+       
+        if trimmed_input.starts_with("PATH=") {
+            let path_value = trimmed_input[5..].trim();
+            env::set_var("PATH", path_value);
+            continue;
+        }
 
         let parts: Vec<&str> = trimmed_input.split_whitespace().collect();
         let command_str = parts[0];
         let args = &parts[1..];
+
+        let current_path = env::var("PATH").unwrap_or_else(|_| String::from("/usr/bin:/bin"));
 
         match Command::from_str(command_str) {
             Command::Exit => {
@@ -39,7 +47,7 @@ fn main() {
             Command::Pwd => ShellCommands::pwd(),
             Command::Type => {
                 if let Some(arg) = args.get(0) {
-                    ShellCommands::r#type(arg);
+                    ShellCommands::r#type(arg, &current_path);
                 } else {
                     ShellCommands::exit(0);
                 }
