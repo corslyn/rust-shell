@@ -9,6 +9,7 @@ pub struct ShellCommands;
 
 pub enum Command {
     // TODO : Add commands
+    Cd,
     Echo,
     Exit,
     Env,
@@ -20,6 +21,7 @@ pub enum Command {
 impl Command {
     pub fn from_str(command: &str) -> Command {
         match command {
+            "cd" => Command::Cd,
             "echo" => Command::Echo,
             "exit" => Command::Exit,
             "env" => Command::Env,
@@ -42,6 +44,16 @@ impl ShellCommands {
             }
         }
         None
+    }
+
+    pub fn cd(args: &[&str]) {
+        if let Some(dir) = args.get(0) {
+            if let Err(e) = env::set_current_dir(dir) {
+                eprintln!("{}", e);
+            }
+        } else {
+            env::set_current_dir(env::home_dir().unwrap());
+        }
     }
 
     pub fn echo(parts: &[&str]) {

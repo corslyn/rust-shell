@@ -8,7 +8,10 @@ mod commands;
 use commands::{Command, ShellCommands};
 fn main() {
     loop {
-        print!("$ ");
+        let user = env::var("USER").unwrap();
+        let hostname = env::var("NAME").unwrap();
+        let pwd = env::current_dir().unwrap();
+        print!("{}@{}:{}$ ", user, hostname, pwd.display());
         io::stdout().flush().unwrap();
 
         let stdin = io::stdin();
@@ -33,6 +36,9 @@ fn main() {
         let current_path = env::var("PATH").unwrap_or_else(|_| String::from("/usr/bin:/bin"));
 
         match Command::from_str(command_str) {
+            Command::Cd => {
+                ShellCommands::cd(args);
+            }
             Command::Echo => {
                 ShellCommands::echo(&parts);
             }
