@@ -1,4 +1,9 @@
-use std::{env, path::Path, process};
+use std::{
+    env,
+    io::{self, Write},
+    path::Path,
+    process,
+};
 
 pub struct ShellCommands;
 
@@ -77,12 +82,27 @@ impl ShellCommands {
         }
     }
 
-    pub fn unknown(command: &str) {
-        let path = env::var("PATH").unwrap();
+    pub fn unknown(command: &str, args: &[&str]) {
+        let path = env::var("PATH").unwrap_or_else(|_| String::from("/usr/bin:/bin"));
         if let Some(found_path) = ShellCommands::check_in_path(command, &path) {
-            process::Command::new(command).output().unwrap();
-            println!();
+            // Try to execute the command
+            let output = process::Command::new(command).args(args).output();
+
+            match output {
+                Ok(output) => {
+                    if !output.stdout.is_empty() {
+                        io::stdout().write_all(&output.stdout).unwrap();
+                    }
+                    if !output.stderr.is_empty() {
+                        io::stderr().write_all(&output.stderr).unwrap();
+                    }
+                }
+                Err(err) => {
+                    eprintln!("Error executing {}: {}", command, err);
+                }
+            }
         } else {
+            // Command not found
             eprintln!("{}: command not found", command);
         }
     }

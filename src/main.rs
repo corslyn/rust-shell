@@ -59,7 +59,7 @@ fn main() {
                     ShellCommands::exit(0);
                 }
             }
-            Command::Unknown(_) => ShellCommands::unknown(command_str),
+            Command::Unknown(_) => ShellCommands::unknown(command_str, args),
         }
     }
 }
