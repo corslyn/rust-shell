@@ -35,6 +35,7 @@ fn main() {
                     ShellCommands::exit(0); // Default to exit code 0
                 }
             }
+            Command::Env => ShellCommands::env(),
             Command::Pwd => ShellCommands::pwd(),
             Command::Type => {
                 if let Some(arg) = args.get(0) {
