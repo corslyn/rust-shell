@@ -1,9 +1,10 @@
-use std::{env, path::Path};
+use std::{env, path::Path, process};
 
 pub struct ShellCommands;
 
 pub enum Command {
     // TODO : Add commands
+    Echo,
     Exit,
     Env,
     Pwd,
@@ -14,6 +15,7 @@ pub enum Command {
 impl Command {
     pub fn from_str(command: &str) -> Command {
         match command {
+            "echo" => Command::Echo,
             "exit" => Command::Exit,
             "env" => Command::Env,
             "pwd" => Command::Pwd,
@@ -25,18 +27,22 @@ impl Command {
 
 impl ShellCommands {
     // add commands here
-
     pub fn check_in_path(command: &str, path: &str) -> Option<std::path::PathBuf> {
         let paths: Vec<&str> = path.split(":").collect();
 
         for dir in paths {
             let candidate = Path::new(dir).join(command);
             if candidate.is_file() {
-                return Some(candidate)
+                return Some(candidate);
             }
-
         }
         None
+    }
+
+    pub fn echo(parts: &[&str]) {
+        if parts.len() > 1 {
+            println!("{}", parts[1..].join(" "));
+        }
     }
 
     pub fn exit(exit_code: i32) {
@@ -64,7 +70,6 @@ impl ShellCommands {
                 } else {
                     eprintln!("type: {}: not found", command);
                 }
-               
             }
             _ => {
                 println!("{} is a shell builtin", command);
@@ -73,6 +78,12 @@ impl ShellCommands {
     }
 
     pub fn unknown(command: &str) {
-        eprintln!("{}: command not found", command);
+        let path = env::var("PATH").unwrap();
+        if let Some(found_path) = ShellCommands::check_in_path(command, &path) {
+            process::Command::new(command).output().unwrap();
+            println!();
+        } else {
+            eprintln!("{}: command not found", command);
+        }
     }
 }

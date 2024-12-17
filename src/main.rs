@@ -1,4 +1,8 @@
-use std::{env, io::{self, Read, Write}, process::exit};
+use std::{
+    env,
+    io::{self, Read, Write},
+    process::exit,
+};
 
 mod commands;
 use commands::{Command, ShellCommands};
@@ -15,7 +19,7 @@ fn main() {
         if trimmed_input.is_empty() {
             continue;
         }
-       
+
         if trimmed_input.starts_with("PATH=") {
             let path_value = trimmed_input[5..].trim();
             env::set_var("PATH", path_value);
@@ -29,6 +33,9 @@ fn main() {
         let current_path = env::var("PATH").unwrap_or_else(|_| String::from("/usr/bin:/bin"));
 
         match Command::from_str(command_str) {
+            Command::Echo => {
+                ShellCommands::echo(&parts);
+            }
             Command::Exit => {
                 // Check if an argument is provided for the exit code
                 if let Some(arg) = args.get(0) {
