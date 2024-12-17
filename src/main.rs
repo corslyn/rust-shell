@@ -36,6 +36,13 @@ fn main() {
                 }
             }
             Command::Pwd => ShellCommands::pwd(),
+            Command::Type => {
+                if let Some(arg) = args.get(0) {
+                    ShellCommands::r#type(arg);
+                } else {
+                    ShellCommands::exit(0);
+                }
+            }
             Command::Unknown(_) => ShellCommands::unknown(command_str),
         }
     }

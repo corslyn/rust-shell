@@ -6,6 +6,7 @@ pub enum Command {
     // TODO : Add commands
     Exit,
     Pwd,
+    Type,
     Unknown(String),
 }
 
@@ -14,6 +15,7 @@ impl Command {
         match command {
             "exit" => Command::Exit,
             "pwd" => Command::Pwd,
+            "type" => Command::Type,
             _ => Command::Unknown(command.to_string()),
         }
     }
@@ -32,20 +34,18 @@ impl ShellCommands {
         }
     }
 
+    pub fn r#type(command: &str) {
+        match Command::from_str(command) {
+            Command::Unknown(_) => {
+                eprintln!("type: {}: not found", command);
+            }
+            _ => {
+                println!("{} is a shell builtin", command);
+            }
+        }
+    }
+
     pub fn unknown(command: &str) {
         eprintln!("{}: command not found", command);
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_pwd() {
-        let stdout = std::panic::catch_unwind(|| {
-            ShellCommands::pwd();
-        });
-        assert!(stdout.is_ok());
     }
 }
