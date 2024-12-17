@@ -56,7 +56,7 @@ fn main() {
                 if let Some(arg) = args.get(0) {
                     ShellCommands::r#type(arg, &current_path);
                 } else {
-                    ShellCommands::exit(0);
+                    continue;
                 }
             }
             Command::Unknown(_) => ShellCommands::unknown(command_str, args),
