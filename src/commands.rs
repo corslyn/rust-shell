@@ -52,7 +52,7 @@ impl ShellCommands {
                 eprintln!("{}", e);
             }
         } else {
-            env::set_current_dir(env::home_dir().unwrap());
+            env::set_current_dir(env::var("HOME").unwrap());
         }
     }
 

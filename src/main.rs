@@ -1,17 +1,28 @@
 use std::{
     env,
-    io::{self, Read, Write},
-    process::exit,
+    io::{self, Write},
 };
 
+mod colors;
 mod commands;
+use colors::colors::*;
 use commands::{Command, ShellCommands};
 fn main() {
     loop {
-        let user = env::var("USER").unwrap();
-        let hostname = env::var("NAME").unwrap();
-        let pwd = env::current_dir().unwrap();
-        print!("{}@{}:{}$ ", user, hostname, pwd.display());
+        let user = colorize(&env::var("USER").unwrap(), GREEN) + &colorize("@", GREEN);
+        let hostname = colorize(&env::var("NAME").unwrap(), GREEN);
+        let home_dir = env::var("HOME").unwrap();
+
+        let current_dir = env::current_dir().unwrap();
+        let current_dir_str = current_dir.display().to_string();
+
+        let pwd = if current_dir_str.starts_with(&home_dir) {
+            current_dir_str.replacen(&home_dir, "~", 1) // replaces home dir by ~
+        } else {
+            current_dir_str
+        };
+
+        print!("{}{}:{}$ ", user, hostname, colorize(&pwd, BLUE),);
         io::stdout().flush().unwrap();
 
         let stdin = io::stdin();
